@@ -23,6 +23,7 @@
 		0A2B377927A8FC7700834E52 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2B377827A8FC7700834E52 /* ProfileViewController.swift */; };
 		0A2B377C27A9031800834E52 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A2B377B27A9031800834E52 /* Extensions.swift */; };
 		0A5255F727ABAF530021B30F /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A5255F627ABAF530021B30F /* ChatViewController.swift */; };
+		0A5255F927ABC6620021B30F /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A5255F827ABC6620021B30F /* Storage.swift */; };
 		618C1792BBB793EE1A7BF201 /* Pods_Messenger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3FFAF98C5BD90BAA7F0B024 /* Pods_Messenger.framework */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +46,7 @@
 		0A2B377827A8FC7700834E52 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		0A2B377B27A9031800834E52 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		0A5255F627ABAF530021B30F /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
+		0A5255F827ABC6620021B30F /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		5E86DD329F99AC816656F9F0 /* Pods-Messenger.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.debug.xcconfig"; path = "Target Support Files/Pods-Messenger/Pods-Messenger.debug.xcconfig"; sourceTree = "<group>"; };
 		84D45D52C1286C5DA9604BD9 /* Pods-Messenger.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.release.xcconfig"; path = "Target Support Files/Pods-Messenger/Pods-Messenger.release.xcconfig"; sourceTree = "<group>"; };
 		D3FFAF98C5BD90BAA7F0B024 /* Pods_Messenger.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Messenger.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -138,6 +140,7 @@
 				0A2B375627A8F9BE00834E52 /* SceneDelegate.swift */,
 				0A2B377B27A9031800834E52 /* Extensions.swift */,
 				0A221C8E27AA89A70002EBF0 /* DatabaseManager.swift */,
+				0A5255F827ABC6620021B30F /* Storage.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -304,6 +307,7 @@
 				0A2B375727A8F9BE00834E52 /* SceneDelegate.swift in Sources */,
 				0A5255F727ABAF530021B30F /* ChatViewController.swift in Sources */,
 				0A2B377327A8FC2C00834E52 /* PhotoViewerViewController.swift in Sources */,
+				0A5255F927ABC6620021B30F /* Storage.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
