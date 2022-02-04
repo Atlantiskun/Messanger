@@ -141,8 +141,6 @@ class LoginViewController: UIViewController {
                                          y: facebookLoginButton.bottom + 10,
                                          width: scrollView.width - 60,
                                          height: 52)
-//        facebookLoginButton.center = scrollView.center
-//        facebookLoginButton.frame.origin.y = loginButton.bottom + 20
     }
     
     @objc private func loginButtonTapped() {
@@ -176,6 +174,8 @@ class LoginViewController: UIViewController {
             }
             
             let user = result.user
+            UserDefaults.standard.set(email, forKey: "email")
+            
             print("Logged in User: \(user)")
             strongSelf.navigationController?.dismiss(animated: true, completion: nil)
         }
@@ -245,7 +245,7 @@ extension LoginViewController: LoginButtonDelegate {
                 return
             }
             
-            
+            UserDefaults.standard.set(email, forKey: "email")
             
             DatabaseManager.shared.userExists(with: email) { exists in
                 if !exists {
@@ -323,11 +323,9 @@ extension LoginViewController {
             if let givenName = userProfile.givenName,
                let familyName = userProfile.familyName,
                let emailAddres = user.profile?.email {
-                print("""
-                    Email is \(emailAddres)
-                    Given name is \(givenName)
-                    Family name is \(familyName)
-                    """)
+                
+                UserDefaults.standard.set(emailAddres, forKey: "email")
+                
                 DatabaseManager.shared.userExists(with: emailAddres) { exists in
                     if !exists {
                         let chatUser = ChatAppUser(firstName: givenName,
