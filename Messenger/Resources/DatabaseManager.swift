@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseDatabase
+import MessageKit
 
 final class DatabaseManager {
     
@@ -349,6 +350,25 @@ extension DatabaseManager {
                       let type = dictionary["type"] as? String else {
                     return nil
                 }
+                var kind: MessageKind?
+                if type == "photo" {
+                    // photo
+                    guard let imageUrl = URL(string: content),
+                          let placeholder = UIImage(systemName: "plus") else {
+                        return nil
+                    }
+                    
+                    let media = Media(url: imageUrl,
+                                      image: nil,
+                                      placeholderImage: placeholder,
+                                      size: CGSize(width: 300, height: 300))
+                    kind = .photo(media)
+                } else {
+                    kind = .text(content)
+                }
+                guard let finalKind = kind else {
+                    return nil
+                }
                 
                 let sender = Sender(photoURL: "",
                                     senderId: senderEmail,
@@ -357,7 +377,7 @@ extension DatabaseManager {
                 return Message(sender: sender,
                                messageId: messageID,
                                sentDate: date,
-                               kind: .text(content))
+                               kind: finalKind)
             }
             complition(.success(messages))
         }
@@ -394,7 +414,10 @@ extension DatabaseManager {
                 message = messageText
             case .attributedText(_):
                 break
-            case .photo(_):
+            case .photo(let mediaItem):
+                if let targetUrltring = mediaItem.url?.absoluteString {
+                    message = targetUrltring
+                }
                 break
             case .video(_):
                 break
@@ -513,7 +536,7 @@ extension DatabaseManager {
                             return
                         }
                     }
-                }   
+                }
                 complition(true)
             }
         }
