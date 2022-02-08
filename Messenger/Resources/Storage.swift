@@ -76,7 +76,7 @@ final class StorageManager {
         storage.child("message_videos/\(fileName)").putData(videoData, metadata: nil) { [weak self] metadata, error in
             guard error == nil else {
                 // failed
-                print("failed to upload videofile to firebase: \(error)")
+                print("failed to upload videofile to firebase: \(String(describing: error))")
                 complition(.failure(StorageErrors.failedToUpload))
                 return
             }

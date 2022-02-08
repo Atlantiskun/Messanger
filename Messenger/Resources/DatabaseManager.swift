@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseDatabase
 import MessageKit
+import CoreLocation
 
 final class DatabaseManager {
     
@@ -362,7 +363,7 @@ extension DatabaseManager {
                                       size: CGSize(width: 300, height: 300))
                     kind = .photo(media)
                 } else if type == "video" {
-                    // photo
+                    // video
                     guard let videoUrl = URL(string: content),
                           let placeholder = UIImage(named: "video_placeholder") else {
                         return nil
@@ -373,6 +374,18 @@ extension DatabaseManager {
                                       placeholderImage: placeholder,
                                       size: CGSize(width: 300, height: 300))
                     kind = .video(media)
+                } else if type == "location" {
+                    // location
+                    let locationComponents = content.components(separatedBy: ",")
+                    guard let longitude = Double(locationComponents[0]),
+                          let latitude = Double(locationComponents[1]) else {
+                        return nil
+                    }
+                    print("long = \(longitude), lat = \(latitude)")
+                    
+                    let location = Location(location: CLLocation(latitude: latitude, longitude: longitude),
+                                            size: CGSize(width: 300, height: 300))
+                    kind = .location(location)
                 } else {
                     kind = .text(content)
                 }
@@ -434,8 +447,9 @@ extension DatabaseManager {
                     message = targetUrltring
                 }
                 break
-            case .location(_):
-                break
+            case .location(let locationData):
+                let location = locationData.location
+                message = "\(location.coordinate.longitude),\(location.coordinate.latitude)"
             case .emoji(_):
                 break
             case .audio(_):
@@ -587,11 +601,11 @@ extension DatabaseManager {
                                     complition(false)
                                     return
                                 }
+                                complition(true)   
                             }
                         }
                     }
                 }
-                complition(true)
             }
         }
     }
