@@ -30,6 +30,8 @@
 		0A937D9427B2A68E0009980B /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A937D9327B2A68E0009980B /* ChatModels.swift */; };
 		0A937D9627B2A6C60009980B /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A937D9527B2A6C60009980B /* SearchResult.swift */; };
 		0A937D9827B2A7130009980B /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A937D9727B2A7130009980B /* ProfileViewModel.swift */; };
+		0AD6945427B3F9B700AF3946 /* BasicAudioController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD6945327B3F9B700AF3946 /* BasicAudioController.swift */; };
+		0AD6945627B4CBC100AF3946 /* AudioModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD6945527B4CBC100AF3946 /* AudioModel.swift */; };
 		618C1792BBB793EE1A7BF201 /* Pods_Messenger.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D3FFAF98C5BD90BAA7F0B024 /* Pods_Messenger.framework */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +61,8 @@
 		0A937D9327B2A68E0009980B /* ChatModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
 		0A937D9527B2A6C60009980B /* SearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResult.swift; sourceTree = "<group>"; };
 		0A937D9727B2A7130009980B /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		0AD6945327B3F9B700AF3946 /* BasicAudioController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicAudioController.swift; sourceTree = "<group>"; };
+		0AD6945527B4CBC100AF3946 /* AudioModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioModel.swift; sourceTree = "<group>"; };
 		5E86DD329F99AC816656F9F0 /* Pods-Messenger.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.debug.xcconfig"; path = "Target Support Files/Pods-Messenger/Pods-Messenger.debug.xcconfig"; sourceTree = "<group>"; };
 		84D45D52C1286C5DA9604BD9 /* Pods-Messenger.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Messenger.release.xcconfig"; path = "Target Support Files/Pods-Messenger/Pods-Messenger.release.xcconfig"; sourceTree = "<group>"; };
 		D3FFAF98C5BD90BAA7F0B024 /* Pods_Messenger.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Messenger.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -117,6 +121,7 @@
 				0A2B377827A8FC7700834E52 /* ProfileViewController.swift */,
 				0A5255F627ABAF530021B30F /* ChatViewController.swift */,
 				0A937D8E27B24EC20009980B /* LocationPickerViewController.swift */,
+				0AD6945327B3F9B700AF3946 /* BasicAudioController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -139,6 +144,7 @@
 				0A937D9327B2A68E0009980B /* ChatModels.swift */,
 				0A937D9527B2A6C60009980B /* SearchResult.swift */,
 				0A937D9727B2A7130009980B /* ProfileViewModel.swift */,
+				0AD6945527B4CBC100AF3946 /* AudioModel.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -330,6 +336,7 @@
 				0A7F30A227B1388800E8670D /* NewConversationCell.swift in Sources */,
 				0A221C8F27AA89A70002EBF0 /* DatabaseManager.swift in Sources */,
 				0A937D9427B2A68E0009980B /* ChatModels.swift in Sources */,
+				0AD6945427B3F9B700AF3946 /* BasicAudioController.swift in Sources */,
 				0A2B377127A8FC0700834E52 /* RegisterViewController.swift in Sources */,
 				0A2B377727A8FC6700834E52 /* NewConversationViewController.swift in Sources */,
 				0A2B375927A8F9BE00834E52 /* ConversationsViewController.swift in Sources */,
@@ -338,6 +345,7 @@
 				0A2B375527A8F9BE00834E52 /* AppDelegate.swift in Sources */,
 				0A2B377927A8FC7700834E52 /* ProfileViewController.swift in Sources */,
 				0A2B375727A8F9BE00834E52 /* SceneDelegate.swift in Sources */,
+				0AD6945627B4CBC100AF3946 /* AudioModel.swift in Sources */,
 				0A7F30A027B0BF5500E8670D /* ConversationTableViewCell.swift in Sources */,
 				0A5255F727ABAF530021B30F /* ChatViewController.swift in Sources */,
 				0A2B377327A8FC2C00834E52 /* PhotoViewerViewController.swift in Sources */,

@@ -9,6 +9,7 @@ import Foundation
 import FirebaseDatabase
 import MessageKit
 import CoreLocation
+import AVFoundation
 
 /// Manager object to read and write data to real time firebase database
 final class DatabaseManager {
@@ -395,6 +396,19 @@ extension DatabaseManager {
                     let location = Location(location: CLLocation(latitude: latitude, longitude: longitude),
                                             size: CGSize(width: 300, height: 300))
                     kind = .location(location)
+                } else if type == "audio" {
+                    // auido
+                    let audioComponent = content.components(separatedBy: " | ")
+                    guard let audioUrl = URL(string: audioComponent[0]),
+                          let audioDuration = Float(audioComponent[1]) else {
+                        print("Failed to get audioUrl and audioDuration")
+                        return nil
+                    }
+                    let audio = Audio(url: audioUrl,
+                                      duration: audioDuration,
+                                      size: CGSize(width: 300, height: 50))
+                    
+                    kind = .audio(audio)
                 } else {
                     kind = .text(content)
                 }
@@ -441,27 +455,46 @@ extension DatabaseManager {
             
             var message = ""
             
+            // Need if kind != text
+            var textForPreview = ""
+            
             switch newMessage.kind {
             case .text(let messageText):
                 message = messageText
+                textForPreview = messageText
             case .attributedText(_):
                 break
             case .photo(let mediaItem):
                 if let targetUrltring = mediaItem.url?.absoluteString {
                     message = targetUrltring
+                    textForPreview = "📷Photo"
                 }
                 break
             case .video(let mediaItem):
                 if let targetUrltring = mediaItem.url?.absoluteString {
                     message = targetUrltring
+                    textForPreview = "🎬Video"
                 }
                 break
             case .location(let locationData):
                 let location = locationData.location
                 message = "\(location.coordinate.longitude),\(location.coordinate.latitude)"
+                textForPreview = "📍Location"
             case .emoji(_):
                 break
-            case .audio(_):
+            case .audio(let audio):
+                message = "\(audio.url.absoluteString) | \(audio.duration)"
+                let roundedDuration = Int(round(audio.duration))
+                let min: String = String(roundedDuration/60)
+                let sec: String = {
+                    let sec = roundedDuration%60
+                    if sec > 9 {
+                        return String(sec)
+                    } else {
+                        return "0\(sec)"
+                    }
+                }()
+                textForPreview = "🎧Voice Message \(min):\(sec)"
                 break
             case .contact(_):
                 break
@@ -500,7 +533,7 @@ extension DatabaseManager {
                     let updatedValue: [String: Any] = [
                         "date": dateString,
                         "is_read": false,
-                        "message": message
+                        "message": textForPreview
                     ]
                     
                     if var currentUserConversations = snapshot.value as? [[String: Any]] {
@@ -555,7 +588,7 @@ extension DatabaseManager {
                             let updatedValue: [String: Any] = [
                                 "date": dateString,
                                 "is_read": false,
-                                "message": message
+                                "message": textForPreview
                             ]
                             var databaseEntryConversations = [[String: Any]]()
                             

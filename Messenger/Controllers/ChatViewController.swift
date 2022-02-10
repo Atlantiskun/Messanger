@@ -15,6 +15,10 @@ import CoreLocation
 
 final class ChatViewController: MessagesViewController {
     
+    private var recordSession: AVAudioSession?
+    private var audioRecorder: AVAudioRecorder?
+    lazy var audioController = BasicAudioController(messageCollectionView: messagesCollectionView)
+    
     private var senderPhotoURL: URL?
     private var otherUserPhotoURL: URL?
     
@@ -62,27 +66,54 @@ final class ChatViewController: MessagesViewController {
         messagesCollectionView.messagesDisplayDelegate = self
         messagesCollectionView.messageCellDelegate = self
         messageInputBar.delegate = self
-        setupInputButton()
+        
+        // Voice recprd feach
+        recordSession = AVAudioSession.sharedInstance()
+        
+        if let recordSession = recordSession {
+            do {
+                try recordSession.setCategory(.playAndRecord, mode: .default, options: .mixWithOthers)
+                try recordSession.setActive(true, options: .notifyOthersOnDeactivation)
+                recordSession.requestRecordPermission { [unowned self] allowed in
+                    DispatchQueue.main.async {
+                        if !allowed {
+                            // failed to record!
+                            setupInputButton(whereVoiceIs: false)
+                            
+                        } else {
+                            // can record
+                            setupInputButton(whereVoiceIs: true)
+                        }
+                    }
+                }
+            } catch {
+                // failed to record!
+            }
+        }
     }
     
-//    override func viewDidLayoutSubviews() {
-//        super .viewDidLayoutSubviews()
-//        messagesCollectionView.frame = CGRect(x: 0,
-//                                              y: view.height - (navigationController?.navigationBar.height)!,
-//                                              width: view.height,
-//                                              height: view.height - (navigationController?.navigationBar.height)!)
-//    }
-    
-    private func setupInputButton() {
+    private func setupInputButton(whereVoiceIs voice: Bool) {
         let button = InputBarButtonItem()
         button.setSize(CGSize(width: 35, height: 35), animated: false)
         button.setImage(UIImage(systemName: "paperclip"), for: .normal)
         button.onTouchUpInside { [weak self] _ in
             self?.presentInputActionSheet()
         }
-        
-        messageInputBar.setLeftStackViewWidthConstant(to: 36, animated: false)
-        messageInputBar.setStackViewItems([button], forStack: .left, animated: false)
+        let recordButton = InputBarButtonItem()
+        recordButton.setSize(CGSize(width: 35, height: 35), animated: false)
+        recordButton.setImage(UIImage(systemName: "mic"), for: .normal)
+        if voice {
+            recordButton.tintColor = .systemBlue
+            recordButton.isEnabled = true
+            let longGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongTapOnButton))
+            recordButton.addGestureRecognizer(longGestureRecognizer)
+        } else {
+            recordButton.tintColor = .systemGray
+            recordButton.isEnabled = false
+        }
+
+        messageInputBar.setLeftStackViewWidthConstant(to: 72, animated: false)
+        messageInputBar.setStackViewItems([button, recordButton], forStack: .left, animated: false)
     }
     
     private func presentInputActionSheet() {
@@ -98,11 +129,6 @@ final class ChatViewController: MessagesViewController {
                                             style: .default,
                                             handler: { [weak self] _ in
                                                 self?.presentVideoActionSheet()
-                                            }))
-        actionSheet.addAction(UIAlertAction(title: "Audio",
-                                            style: .default,
-                                            handler: { _ in
-                                                
                                             }))
         actionSheet.addAction(UIAlertAction(title: "Location",
                                             style: .default,
@@ -256,6 +282,60 @@ extension ChatViewController: UIImagePickerControllerDelegate, UINavigationContr
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
+    }
+    
+    func sendVoiceMessage(withVoice fileUrl: URL, andDurationd duration: Float) {
+        guard let messageId = createMessageId(),
+              let conversationId = conversationId,
+              let name = title,
+              let selfSender = selfSender else {
+            return
+        }
+        
+        let fileName = "voice_message_\(messageId.replacingOccurrences(of: " ", with: "-")).m4a"
+        
+        //Upload voice
+        
+        StorageManager.shared.uploadMessageVoice(with: fileUrl, fileName: fileName) { [weak self] result in
+            //
+            guard let strongSelf = self else {
+                return
+            }
+            
+            switch result {
+            case .success(let urlString):
+                // Ready to send message
+                print("Uploaded Message Voice: \(urlString)")
+                
+                guard let url = URL(string: urlString) else {
+                    return
+                }
+                
+                let audio = Audio(url: url,
+                                  duration: duration,
+                                  size: .zero)
+                
+                let message = Message(sender: selfSender,
+                                      messageId: messageId,
+                                      sentDate: Date(),
+                                      kind: .audio(audio))
+                
+                // Send Message
+                DatabaseManager.shared.sendMessage(to: conversationId,
+                                                   otherUserEmail: strongSelf.otherUserEmail,
+                                                   name: name,
+                                                   newMessage: message) { success in
+                    if success {
+                        print("Sent voice message")
+                    } else {
+                        print("Failed to send photo message")
+                    }
+                }
+                
+            case .failure(let error):
+                print("Message voice upload error: \(error)")
+            }
+        }
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -539,6 +619,31 @@ extension ChatViewController: MessageCellDelegate {
         }
     }
     
+    func didTapPlayButton(in cell: AudioMessageCell) {
+        guard let indexPath = messagesCollectionView.indexPath(for: cell),
+                    let message = messagesCollectionView.messagesDataSource?.messageForItem(at: indexPath, in: messagesCollectionView) else {
+                        print("Failed to identify message when audio cell receive tap gesture")
+                        return
+                }
+                guard audioController.state != .stopped else {
+                    // There is no audio sound playing - prepare to start playing for given audio message
+                    audioController.playSound(for: message, in: cell)
+                    return
+                }
+                if audioController.playingMessage?.messageId == message.messageId {
+                    // tap occur in the current cell that is playing audio sound
+                    if audioController.state == .playing {
+                        audioController.pauseSound(for: message, in: cell)
+                    } else {
+                        audioController.resumeSound()
+                    }
+                } else {
+                    // tap occur in a difference cell that the one is currently playing sound. First stop currently playing and start the sound for given message
+                    audioController.stopAnyOngoingPlaying()
+                    audioController.playSound(for: message, in: cell)
+                }
+    }
+    
     func didTapImage(in cell: MessageCollectionViewCell) {
         guard let indexPath = messagesCollectionView.indexPath(for: cell) else {
             return
@@ -563,6 +668,68 @@ extension ChatViewController: MessageCellDelegate {
             present(vc, animated: true)
         default:
             break
+        }
+    }
+}
+
+extension ChatViewController: AVAudioRecorderDelegate {
+    @objc func handleLongTapOnButton(sender : UIGestureRecognizer) {
+        if sender.state == .began {
+            print("Start voice record")
+            startRecording()
+            
+        } else if sender.state == .ended {
+            print("Stop voice record and send it")
+            finishRecording(success: true)
+        }
+    }
+    
+    private func startRecording() {
+        let audioFilename = getDocumentsDirectory().appendingPathComponent("recording.m4a")
+        
+        let settings = [
+            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+            AVSampleRateKey: 12000,
+            AVNumberOfChannelsKey: 1,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        ]
+        
+        do {
+            audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
+            audioRecorder?.delegate = self
+            audioRecorder?.record()
+        } catch {
+            finishRecording(success: false)
+        }
+    }
+    
+    func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
+    }
+    
+    func finishRecording(success: Bool) {
+        audioRecorder?.stop()
+        audioRecorder = nil
+        
+        if success {
+            // Send message
+            print("Send record")
+            let pathToAudio = getDocumentsDirectory().appendingPathComponent("recording.m4a")
+            do {
+                let durationOfVoice = try AVAudioPlayer(contentsOf: pathToAudio).duration
+                guard durationOfVoice > 0 else {
+                    print("Failed: Auido is very short")
+                    return
+                }
+                sendVoiceMessage(withVoice: pathToAudio, andDurationd: Float(durationOfVoice))
+            } catch {
+                // error
+            }
+            print(pathToAudio)
+            
+        } else {
+            print("Failed to record audio")
         }
     }
 }
